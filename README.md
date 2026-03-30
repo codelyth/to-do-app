@@ -86,21 +86,22 @@ Kurulum:
 
 Projeyi kendi bilgisayarınızda çalıştırmak için aşağıdaki adımları uygulayın:
 
-1. Repoyu klonlayın
+1. Repoyu klonlayın:
 git clone https://github.com/codelyth/to-do-app.git
+
 cd to-do-app
 
-2. Gerekli paketleri yükleyin
+3. Gerekli paketleri yükleyin:
 flutter pub get
 
-3. Firebase yapılandırmasını tamamlayın
+4. Firebase yapılandırmasını tamamlayın
 Bu proje Firebase kullanmaktadır. Uygulamayı çalıştırmadan önce:
 Firebase projesi oluşturun
 Android için yapılandırma dosyasını alın
 "google-services.json" dosyasını uygun klasöre ekleyin.
 Not: Firebase bağlantısı olmadan uygulamanın kimlik doğrulama ve veri işlemleri çalışmaz.
 
-4. Uygulamayı başlatın
+5. Uygulamayı başlatın
 flutter run
 
 Veri Saklama ve Kullanıcı Yapısı:
