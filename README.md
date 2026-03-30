@@ -120,9 +120,9 @@ veriler Firebase Security Rules ile korunur
 
 Desteklenen Platformlar:
 
-Android
+Android, 
 Windows
 
 Geliştiriciler: Şeyma Keskin & Yaprak Cihantimur
-
+---
 Bu proje, görev yönetimi ve kullanıcıya özel veri saklama mantığını öğrenmek ve uygulamak amacıyla geliştirilmiştir. Flutter ile mobil arayüz geliştirme, Firebase ile kimlik doğrulama ve gerçek zamanlı veri yönetimi konularında pratik bir örnek sunar.
