@@ -293,4 +293,4 @@ This project was developed to practice and demonstrate:
 - User-specific data management
 - Modern productivity app design principles
 
-It also serves as a practical example of building a complete full-stack Flutter application using Firebase services.
+It also serves as a practical example of building a complete full-stack Flutter application using Firebase services..
