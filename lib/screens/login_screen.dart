@@ -79,6 +79,47 @@ class _LoginPageState extends State<LoginScreen> {
   }
 }
 
+Future<void> _forgotPassword() async {
+  final email = emailController.text.trim();
+
+  if (email.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Lütfen önce e-posta adresinizi girin"),
+      ),
+    );
+    return;
+  }
+
+  try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Şifre sıfırlama e-postası gönderildi"),
+      ),
+    );
+  } on FirebaseAuthException catch (e) {
+    String message = "Şifre sıfırlama başarısız";
+
+    if (e.code == 'invalid-email') {
+      message = "Geçersiz e-posta adresi";
+    } else if (e.code == 'user-not-found') {
+      message = "Bu e-posta ile kayıtlı kullanıcı bulunamadı";
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Beklenmeyen hata: $e")),
+    );
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,7 +204,7 @@ class _LoginPageState extends State<LoginScreen> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: _forgotPassword,
                       style: TextButton.styleFrom(
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 0),
