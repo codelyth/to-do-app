@@ -12,7 +12,20 @@
           "package_name": "com.example.todolist_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "278064033105-7mealbscv8l3399jdq40casjqvkj9638.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.todolist_app",
+            "certificate_hash": "994c96778ac3f700286de48560dce4ee0bdc5442"
+          }
+        },
+        {
+          "client_id": "278064033105-8p6kjblah87l1vn8uod2ot3ncmfinkj9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDkwHeag-AEfETNPeG-E59NhuHL6QI-ycA"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "278064033105-8p6kjblah87l1vn8uod2ot3ncmfinkj9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

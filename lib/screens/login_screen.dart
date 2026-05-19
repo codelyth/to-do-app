@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todolist_app/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todolist_app/screens/register_screen.dart';
+import 'package:todolist_app/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -241,14 +242,26 @@ class _LoginPageState extends State<LoginScreen> {
                     width: double.infinity,
                     height: 50,
                     child: OutlinedButton(
-                      onPressed: () {},
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: borderColor),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                        backgroundColor: Colors.white,
-                      ),
+                      onPressed: () async {
+                        try {
+                          final result = await AuthService().signInWithGoogle();
+
+                          if (result == null) return;
+
+                          if (!mounted) return;
+
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomeScreen(),
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Google giriş hatası: $e")),
+                          );
+                        }
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [

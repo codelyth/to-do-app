@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:todolist_app/screens/analytics_screen.dart';
 
 class DashScreen extends StatefulWidget {
   const DashScreen({super.key});
@@ -784,21 +785,31 @@ class _DashScreenState extends State<DashScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 20),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 28,
-                                      vertical: 14,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.14),
-                                      borderRadius: BorderRadius.circular(22),
-                                    ),
-                                    child: const Text(
-                                      "VIEW ANALYTICS",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const AnalyticsScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 28,
+                                        vertical: 14,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.14),
+                                        borderRadius: BorderRadius.circular(22),
+                                      ),
+                                      child: const Text(
+                                        "VIEW ANALYTICS",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     ),
                                   ),
