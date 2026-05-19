@@ -14,11 +14,6 @@ class _DashScreenState extends State<DashScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  final Color primaryColor = const Color(0xFF4B4ACF);
-  final Color bgColor = const Color(0xFFF5F6FA);
-  final Color darkText = const Color(0xFF0F172A);
-  final Color lightText = const Color(0xFF8D97AE);
-
   String selectedTab = 'Today';
 
   User? get currentUser => _auth.currentUser;
@@ -87,25 +82,25 @@ class _DashScreenState extends State<DashScreen> {
     }
   }
 
-  Color _priorityBgColor(String priority) {
+  Color _priorityBgColor(String priority, bool isDark) {
     switch (priority) {
       case 'High':
-        return const Color(0xFFFFE3E3);
+        return isDark ? const Color(0xFF4A1F24) : const Color(0xFFFFE3E3);
       case 'Low':
-        return const Color(0xFFE3F7EA);
+        return isDark ? const Color(0xFF163B28) : const Color(0xFFE3F7EA);
       default:
-        return const Color(0xFFF0E5FF);
+        return isDark ? const Color(0xFF32245A) : const Color(0xFFF0E5FF);
     }
   }
 
-  Color _priorityTextColor(String priority) {
+  Color _priorityTextColor(String priority, bool isDark) {
     switch (priority) {
       case 'High':
-        return const Color(0xFFD64545);
+        return isDark ? const Color(0xFFFF8A8A) : const Color(0xFFD64545);
       case 'Low':
-        return const Color(0xFF15803D);
+        return isDark ? const Color(0xFF7BE7A4) : const Color(0xFF15803D);
       default:
-        return const Color(0xFF9B51E0);
+        return isDark ? const Color(0xFFC7B8FF) : const Color(0xFF9B51E0);
     }
   }
 
@@ -295,16 +290,15 @@ class _DashScreenState extends State<DashScreen> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                  ),
                   onPressed: () async {
                     final title = titleController.text.trim();
                     final description = descriptionController.text.trim();
 
                     if (title.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Task title cannot be empty')),
+                        const SnackBar(
+                          content: Text('Task title cannot be empty'),
+                        ),
                       );
                       return;
                     }
@@ -335,7 +329,9 @@ class _DashScreenState extends State<DashScreen> {
                       Navigator.pop(context);
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Task added successfully')),
+                        const SnackBar(
+                          content: Text('Task added successfully'),
+                        ),
                       );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -343,10 +339,7 @@ class _DashScreenState extends State<DashScreen> {
                       );
                     }
                   },
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: const Text('Save'),
                 ),
               ],
             );
@@ -356,9 +349,13 @@ class _DashScreenState extends State<DashScreen> {
     );
   }
 
-  Future<void> _showEditTaskDialog(String docId, Map<String, dynamic> task) async {
+  Future<void> _showEditTaskDialog(
+    String docId,
+    Map<String, dynamic> task,
+  ) async {
     final titleController = TextEditingController(text: task['title'] ?? '');
-    final descriptionController = TextEditingController(text: task['description'] ?? '');
+    final descriptionController =
+        TextEditingController(text: task['description'] ?? '');
 
     final categoryOptions = ['Today', 'Planned', 'Personal'];
     final priorityOptions = ['Low', 'Normal', 'High'];
@@ -383,9 +380,10 @@ class _DashScreenState extends State<DashScreen> {
       selectedDate = DateTime.now();
     }
 
-    TimeOfDay? startTime = task['startHour'] != null && task['startMinute'] != null
-        ? TimeOfDay(hour: task['startHour'], minute: task['startMinute'])
-        : null;
+    TimeOfDay? startTime =
+        task['startHour'] != null && task['startMinute'] != null
+            ? TimeOfDay(hour: task['startHour'], minute: task['startMinute'])
+            : null;
 
     TimeOfDay? endTime = task['endHour'] != null && task['endMinute'] != null
         ? TimeOfDay(hour: task['endHour'], minute: task['endMinute'])
@@ -530,9 +528,6 @@ class _DashScreenState extends State<DashScreen> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                  ),
                   onPressed: () async {
                     final title = titleController.text.trim();
                     final description = descriptionController.text.trim();
@@ -560,10 +555,7 @@ class _DashScreenState extends State<DashScreen> {
                     if (!mounted) return;
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    'Update',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: const Text('Update'),
                 ),
               ],
             );
@@ -614,6 +606,23 @@ class _DashScreenState extends State<DashScreen> {
       );
     }
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryColor =
+        isDark ? const Color(0xFF8B8CFF) : const Color(0xFF4B4ACF);
+    final bgColor =
+        isDark ? const Color(0xFF111827) : const Color(0xFFF5F6FA);
+    final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
+    final darkText = isDark ? Colors.white : const Color(0xFF0F172A);
+    final lightText =
+        isDark ? const Color(0xFFCBD5E1) : const Color(0xFF8D97AE);
+    final borderColor =
+        isDark ? const Color(0xFF374151) : const Color(0xFFCBD5E1);
+    final softCardColor =
+        isDark ? const Color(0xFF273244) : const Color(0xFFF0F1FA);
+    final iconColor =
+        isDark ? const Color(0xFFE5E7EB) : const Color(0xFF475569);
+
     return Scaffold(
       backgroundColor: bgColor,
       floatingActionButton: FloatingActionButton(
@@ -659,7 +668,8 @@ class _DashScreenState extends State<DashScreen> {
 
                     final d = ts.toDate();
                     final taskDay = DateTime(d.year, d.month, d.day);
-                    return category == 'Today' || _isSameDay(taskDay, todayOnly);
+                    return category == 'Today' ||
+                        _isSameDay(taskDay, todayOnly);
                   }
 
                   return category == selectedTab;
@@ -683,10 +693,12 @@ class _DashScreenState extends State<DashScreen> {
                   return aTs.compareTo(bTs);
                 });
 
-                final completedCount =
-                    filteredTasks.where((task) => task['isCompleted'] == true).length;
+                final completedCount = filteredTasks
+                    .where((task) => task['isCompleted'] == true)
+                    .length;
                 final totalCount = filteredTasks.length;
-                final progress = totalCount == 0 ? 0.0 : completedCount / totalCount;
+                final progress =
+                    totalCount == 0 ? 0.0 : completedCount / totalCount;
 
                 return SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
@@ -719,13 +731,13 @@ class _DashScreenState extends State<DashScreen> {
                                 width: 58,
                                 height: 58,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFF0F1FA),
+                                  color: softCardColor,
                                   borderRadius: BorderRadius.circular(18),
                                 ),
-                                child: const Icon(
+                                child: Icon(
                                   Icons.notifications_none,
                                   size: 30,
-                                  color: Color(0xFF475569),
+                                  color: iconColor,
                                 ),
                               ),
                               Positioned(
@@ -790,7 +802,8 @@ class _DashScreenState extends State<DashScreen> {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => const AnalyticsScreen(),
+                                          builder: (context) =>
+                                              const AnalyticsScreen(),
                                         ),
                                       );
                                     },
@@ -830,7 +843,8 @@ class _DashScreenState extends State<DashScreen> {
                                       value: progress,
                                       strokeWidth: 13,
                                       backgroundColor: Colors.white24,
-                                      valueColor: const AlwaysStoppedAnimation<Color>(
+                                      valueColor:
+                                          const AlwaysStoppedAnimation<Color>(
                                         Colors.white,
                                       ),
                                     ),
@@ -864,11 +878,11 @@ class _DashScreenState extends State<DashScreen> {
 
                       Row(
                         children: [
-                          _buildTab("Today"),
+                          _buildTab("Today", primaryColor, isDark),
                           const SizedBox(width: 10),
-                          _buildTab("Planned"),
+                          _buildTab("Planned", primaryColor, isDark),
                           const SizedBox(width: 10),
-                          _buildTab("Personal"),
+                          _buildTab("Personal", primaryColor, isDark),
                         ],
                       ),
 
@@ -903,11 +917,13 @@ class _DashScreenState extends State<DashScreen> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: cardColor,
                             borderRadius: BorderRadius.circular(28),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
+                                color: Colors.black.withOpacity(
+                                  isDark ? 0.16 : 0.04,
+                                ),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -928,8 +944,10 @@ class _DashScreenState extends State<DashScreen> {
                         ...filteredTasks.map((task) {
                           final docId = task['id'] as String;
                           final title = (task['title'] ?? '').toString();
-                          final description = (task['description'] ?? '').toString();
-                          final priority = (task['priority'] ?? 'Normal').toString();
+                          final description =
+                              (task['description'] ?? '').toString();
+                          final priority =
+                              (task['priority'] ?? 'Normal').toString();
                           final completed = task['isCompleted'] == true;
                           final timeText = _formatTimeRange(task);
 
@@ -941,11 +959,13 @@ class _DashScreenState extends State<DashScreen> {
                                 vertical: 18,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: cardColor,
                                 borderRadius: BorderRadius.circular(28),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
+                                    color: Colors.black.withOpacity(
+                                      isDark ? 0.16 : 0.04,
+                                    ),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -955,17 +975,20 @@ class _DashScreenState extends State<DashScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   GestureDetector(
-                                    onTap: () => _toggleTaskComplete(docId, completed),
+                                    onTap: () =>
+                                        _toggleTaskComplete(docId, completed),
                                     child: Container(
                                       width: 42,
                                       height: 42,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(14),
                                         border: Border.all(
-                                          color: const Color(0xFFCBD5E1),
+                                          color: borderColor,
                                           width: 2,
                                         ),
-                                        color: completed ? primaryColor : Colors.white,
+                                        color: completed
+                                            ? primaryColor
+                                            : cardColor,
                                       ),
                                       child: completed
                                           ? const Icon(
@@ -979,7 +1002,8 @@ class _DashScreenState extends State<DashScreen> {
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           title,
@@ -996,28 +1020,36 @@ class _DashScreenState extends State<DashScreen> {
                                         Row(
                                           children: [
                                             Container(
-                                              padding: const EdgeInsets.symmetric(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
                                                 horizontal: 12,
                                                 vertical: 7,
                                               ),
                                               decoration: BoxDecoration(
-                                                color: _priorityBgColor(priority),
-                                                borderRadius: BorderRadius.circular(12),
+                                                color: _priorityBgColor(
+                                                  priority,
+                                                  isDark,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                               child: Text(
                                                 _priorityText(priority),
                                                 style: TextStyle(
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.w800,
-                                                  color: _priorityTextColor(priority),
+                                                  color: _priorityTextColor(
+                                                    priority,
+                                                    isDark,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(width: 12),
-                                            const Icon(
+                                            Icon(
                                               Icons.calendar_today_outlined,
                                               size: 18,
-                                              color: Color(0xFF94A3B8),
+                                              color: lightText,
                                             ),
                                             const SizedBox(width: 8),
                                             Expanded(
@@ -1063,11 +1095,12 @@ class _DashScreenState extends State<DashScreen> {
                                             details.globalPosition,
                                           );
                                         },
-                                        child: const Padding(
-                                          padding: EdgeInsets.only(top: 2),
+                                        child: Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 2),
                                           child: Icon(
                                             Icons.more_vert,
-                                            color: Color(0xFF94A3B8),
+                                            color: lightText,
                                           ),
                                         ),
                                       );
@@ -1089,7 +1122,7 @@ class _DashScreenState extends State<DashScreen> {
     );
   }
 
-  Widget _buildTab(String label) {
+  Widget _buildTab(String label, Color primaryColor, bool isDark) {
     final isSelected = selectedTab == label;
 
     return Expanded(
@@ -1103,14 +1136,22 @@ class _DashScreenState extends State<DashScreen> {
           duration: const Duration(milliseconds: 220),
           height: 52,
           decoration: BoxDecoration(
-            color: isSelected ? primaryColor : const Color(0xFFF0F1F6),
+            color: isSelected
+                ? primaryColor
+                : isDark
+                    ? const Color(0xFF1F2937)
+                    : const Color(0xFFF0F1F6),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Center(
             child: Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : const Color(0xFF6B7280),
+                color: isSelected
+                    ? Colors.white
+                    : isDark
+                        ? const Color(0xFFCBD5E1)
+                        : const Color(0xFF6B7280),
                 fontWeight: FontWeight.w700,
                 fontSize: 16,
               ),

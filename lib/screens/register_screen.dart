@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:todolist_app/screens/home_screen.dart';
 import 'package:todolist_app/screens/login_screen.dart';
+import 'package:todolist_app/services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,11 +20,6 @@ class _RegisterPageState extends State<RegisterScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  final Color primaryColor = const Color(0xFF4B4ACF);
-  final Color textDark = const Color(0xFF1B2340);
-  final Color textLight = const Color(0xFF8D97AE);
-  final Color borderColor = const Color(0xFFE2E6EF);
-
   @override
   void dispose() {
     emailController.dispose();
@@ -39,18 +35,14 @@ class _RegisterPageState extends State<RegisterScreen> {
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Lütfen tüm alanları doldurun"),
-        ),
+        const SnackBar(content: Text("Lütfen tüm alanları doldurun")),
       );
       return;
     }
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Şifreler eşleşmiyor"),
-        ),
+        const SnackBar(content: Text("Şifreler eşleşmiyor")),
       );
       return;
     }
@@ -65,9 +57,7 @@ class _RegisterPageState extends State<RegisterScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } on FirebaseAuthException catch (e) {
       String message = "Kayıt başarısız";
@@ -90,9 +80,51 @@ class _RegisterPageState extends State<RegisterScreen> {
     }
   }
 
+  Future<void> _signUpWithGoogle() async {
+    try {
+      final result = await AuthService().signInWithGoogle();
+
+      if (result == null) return;
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google giriş hatası: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryColor =
+        isDark ? const Color(0xFF8B8CFF) : const Color(0xFF4B4ACF);
+    final bgColor =
+        isDark ? const Color(0xFF111827) : const Color(0xFFF3F4F8);
+    final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
+    final iconBoxColor =
+        isDark ? const Color(0xFF273244) : const Color(0xFFF0F1FA);
+    final textDark = isDark ? Colors.white : const Color(0xFF1B2340);
+    final textLight =
+        isDark ? const Color(0xFFCBD5E1) : const Color(0xFF8D97AE);
+    final borderColor =
+        isDark ? const Color(0xFF374151) : const Color(0xFFE2E6EF);
+    final inputFillColor =
+        isDark ? const Color(0xFF111827) : Colors.white;
+    final inputIconColor =
+        isDark ? const Color(0xFFCBD5E1) : const Color(0xFFA7B0C2);
+    final googleTextColor =
+        isDark ? const Color(0xFFE5E7EB) : const Color(0xFF374151);
+    final shadowColor = Colors.black.withOpacity(isDark ? 0.24 : 0.10);
+
     return Scaffold(
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -101,11 +133,11 @@ class _RegisterPageState extends State<RegisterScreen> {
               width: 380,
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 26),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: cardColor,
                 borderRadius: BorderRadius.circular(18),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.10),
+                    color: shadowColor,
                     blurRadius: 18,
                     offset: const Offset(0, 8),
                   ),
@@ -120,7 +152,7 @@ class _RegisterPageState extends State<RegisterScreen> {
                     height: 72,
                     width: 72,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0F1FA),
+                      color: iconBoxColor,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Icon(
@@ -155,25 +187,42 @@ class _RegisterPageState extends State<RegisterScreen> {
 
                   const SizedBox(height: 34),
 
-                  _buildLabel("Email"),
+                  _buildLabel("Email", textLight),
                   const SizedBox(height: 10),
                   _buildTextField(
                     hintText: "Enter your email",
                     prefixIcon: Icons.email_outlined,
                     controller: emailController,
+                    primaryColor: primaryColor,
+                    borderColor: borderColor,
+                    inputFillColor: inputFillColor,
+                    inputIconColor: inputIconColor,
+                    textColor: textDark,
                   ),
 
                   const SizedBox(height: 22),
 
-                  _buildLabel("Password"),
+                  _buildLabel("Password", textLight),
                   const SizedBox(height: 10),
-                  _buildPasswordField(),
+                  _buildPasswordField(
+                    primaryColor: primaryColor,
+                    borderColor: borderColor,
+                    inputFillColor: inputFillColor,
+                    inputIconColor: inputIconColor,
+                    textColor: textDark,
+                  ),
 
                   const SizedBox(height: 22),
 
-                  _buildLabel("Confirm Password"),
+                  _buildLabel("Confirm Password", textLight),
                   const SizedBox(height: 10),
-                  _buildConfirmPasswordField(),
+                  _buildConfirmPasswordField(
+                    primaryColor: primaryColor,
+                    borderColor: borderColor,
+                    inputFillColor: inputFillColor,
+                    inputIconColor: inputIconColor,
+                    textColor: textDark,
+                  ),
 
                   const SizedBox(height: 28),
 
@@ -237,27 +286,27 @@ class _RegisterPageState extends State<RegisterScreen> {
                     width: double.infinity,
                     height: 50,
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: _signUpWithGoogle,
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: borderColor),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(28),
                         ),
-                        backgroundColor: Colors.white,
+                        backgroundColor: inputFillColor,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Icon(
                             Icons.g_mobiledata,
-                            color: Colors.black,
+                            color: googleTextColor,
                             size: 28,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             "Google",
                             style: TextStyle(
-                              color: Color(0xFF374151),
+                              color: googleTextColor,
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
@@ -311,15 +360,15 @@ class _RegisterPageState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, Color labelColor) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF4B5563),
+          color: labelColor,
         ),
       ),
     );
@@ -329,22 +378,28 @@ class _RegisterPageState extends State<RegisterScreen> {
     required String hintText,
     required IconData prefixIcon,
     required TextEditingController controller,
+    required Color primaryColor,
+    required Color borderColor,
+    required Color inputFillColor,
+    required Color inputIconColor,
+    required Color textColor,
   }) {
     return TextField(
       controller: controller,
+      style: TextStyle(color: textColor),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: const TextStyle(
-          color: Color(0xFFA7B0C2),
+        hintStyle: TextStyle(
+          color: inputIconColor,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
         prefixIcon: Icon(
           prefixIcon,
-          color: const Color(0xFFA7B0C2),
+          color: inputIconColor,
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: inputFillColor,
         contentPadding: const EdgeInsets.symmetric(vertical: 18),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
@@ -358,27 +413,34 @@ class _RegisterPageState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField({
+    required Color primaryColor,
+    required Color borderColor,
+    required Color inputFillColor,
+    required Color inputIconColor,
+    required Color textColor,
+  }) {
     return TextField(
       controller: passwordController,
       obscureText: _obscurePassword,
+      style: TextStyle(color: textColor),
       decoration: InputDecoration(
         hintText: "Enter your password",
-        hintStyle: const TextStyle(
-          color: Color(0xFFA7B0C2),
+        hintStyle: TextStyle(
+          color: inputIconColor,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
-        prefixIcon: const Icon(
+        prefixIcon: Icon(
           Icons.lock_outline,
-          color: Color(0xFFA7B0C2),
+          color: inputIconColor,
         ),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword
                 ? Icons.visibility_outlined
                 : Icons.visibility_off_outlined,
-            color: const Color(0xFFA7B0C2),
+            color: inputIconColor,
           ),
           onPressed: () {
             setState(() {
@@ -387,7 +449,7 @@ class _RegisterPageState extends State<RegisterScreen> {
           },
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: inputFillColor,
         contentPadding: const EdgeInsets.symmetric(vertical: 18),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),
@@ -401,27 +463,34 @@ class _RegisterPageState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildConfirmPasswordField() {
+  Widget _buildConfirmPasswordField({
+    required Color primaryColor,
+    required Color borderColor,
+    required Color inputFillColor,
+    required Color inputIconColor,
+    required Color textColor,
+  }) {
     return TextField(
       controller: confirmPasswordController,
       obscureText: _obscureConfirmPassword,
+      style: TextStyle(color: textColor),
       decoration: InputDecoration(
         hintText: "Confirm your password",
-        hintStyle: const TextStyle(
-          color: Color(0xFFA7B0C2),
+        hintStyle: TextStyle(
+          color: inputIconColor,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
-        prefixIcon: const Icon(
+        prefixIcon: Icon(
           Icons.lock_outline,
-          color: Color(0xFFA7B0C2),
+          color: inputIconColor,
         ),
         suffixIcon: IconButton(
           icon: Icon(
             _obscureConfirmPassword
                 ? Icons.visibility_outlined
                 : Icons.visibility_off_outlined,
-            color: const Color(0xFFA7B0C2),
+            color: inputIconColor,
           ),
           onPressed: () {
             setState(() {
@@ -430,7 +499,7 @@ class _RegisterPageState extends State<RegisterScreen> {
           },
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: inputFillColor,
         contentPadding: const EdgeInsets.symmetric(vertical: 18),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(28),

@@ -6,11 +6,6 @@ import 'package:flutter/material.dart';
 class AnalyticsScreen extends StatelessWidget {
   const AnalyticsScreen({super.key});
 
-  final Color primaryColor = const Color(0xFF4B4ACF);
-  final Color bgColor = const Color(0xFFF5F6FA);
-  final Color darkText = const Color(0xFF0F172A);
-  final Color lightText = const Color(0xFF8D97AE);
-
   DateTime _dateOnly(DateTime date) {
     return DateTime(date.year, date.month, date.day);
   }
@@ -86,6 +81,18 @@ class AnalyticsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryColor =
+        isDark ? const Color(0xFF8B8CFF) : const Color(0xFF4B4ACF);
+    final bgColor =
+        isDark ? const Color(0xFF111827) : const Color(0xFFF5F6FA);
+    final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
+    final darkText = isDark ? Colors.white : const Color(0xFF0F172A);
+    final lightText =
+        isDark ? const Color(0xFFCBD5E1) : const Color(0xFF8D97AE);
+    final shadowColor = Colors.black.withOpacity(isDark ? 0.18 : 0.04);
 
     if (user == null) {
       return const Scaffold(
@@ -209,13 +216,16 @@ class AnalyticsScreen extends StatelessWidget {
                           );
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: cardColor,
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
+                                color: shadowColor,
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -351,101 +361,109 @@ class AnalyticsScreen extends StatelessWidget {
 
                   const SizedBox(height: 28),
 
-                  /// Weekly chart
                   _SectionCard(
                     title: "Weekly Activity",
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 170,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: List.generate(7, (index) {
-                              final value = weeklyCounts[index];
-                              final ratio = maxWeeklyValue == 0
-                                  ? 0.05
-                                  : value / maxWeeklyValue;
+                    cardColor: cardColor,
+                    darkText: darkText,
+                    shadowColor: shadowColor,
+                    child: SizedBox(
+                      height: 170,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: List.generate(7, (index) {
+                          final value = weeklyCounts[index];
+                          final ratio =
+                              maxWeeklyValue == 0 ? 0.05 : value / maxWeeklyValue;
 
-                              return Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      value.toString(),
-                                      style: TextStyle(
-                                        color: lightText,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    AnimatedContainer(
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      width: 22,
-                                      height: 24 + (110 * ratio),
-                                      decoration: BoxDecoration(
-                                        color: primaryColor,
-                                        borderRadius:
-                                            BorderRadius.circular(18),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      _dayName(last7Days[index]),
-                                      style: TextStyle(
-                                        color: lightText,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ],
+                          return Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Text(
+                                  value.toString(),
+                                  style: TextStyle(
+                                    color: lightText,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              );
-                            }),
-                          ),
-                        ),
-                      ],
+                                const SizedBox(height: 8),
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  width: 22,
+                                  height: 24 + (110 * ratio),
+                                  decoration: BoxDecoration(
+                                    color: primaryColor,
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Text(
+                                  _dayName(last7Days[index]),
+                                  style: TextStyle(
+                                    color: lightText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ),
                     ),
                   ),
 
                   const SizedBox(height: 22),
 
-                  /// Stats
                   Row(
                     children: [
                       _StatCard(
                         value: completed.toString(),
                         label: "COMPLETED",
                         color: primaryColor,
+                        cardColor: cardColor,
+                        shadowColor: shadowColor,
+                        lightText: lightText,
                       ),
                       const SizedBox(width: 12),
                       _StatCard(
                         value: pending.toString(),
                         label: "PENDING",
                         color: const Color(0xFFDE7A00),
+                        cardColor: cardColor,
+                        shadowColor: shadowColor,
+                        lightText: lightText,
                       ),
                       const SizedBox(width: 12),
                       _StatCard(
                         value: total.toString(),
                         label: "TOTAL",
                         color: const Color(0xFF0F9D6C),
+                        cardColor: cardColor,
+                        shadowColor: shadowColor,
+                        lightText: lightText,
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 22),
 
-                  /// Category breakdown
                   _SectionCard(
                     title: "Category Breakdown",
+                    cardColor: cardColor,
+                    darkText: darkText,
+                    shadowColor: shadowColor,
                     child: Row(
                       children: [
                         SizedBox(
                           width: 132,
                           height: 132,
                           child: CustomPaint(
-                            painter: _DonutChartPainter(categories),
+                            painter: _DonutChartPainter(
+                              categories,
+                              isDark: isDark,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 22),
@@ -456,18 +474,24 @@ class AnalyticsScreen extends StatelessWidget {
                                 color: primaryColor,
                                 label: "Today",
                                 value: categories['Today'] ?? 0,
+                                darkText: darkText,
+                                lightText: lightText,
                               ),
                               const SizedBox(height: 12),
                               _LegendItem(
                                 color: const Color(0xFF9B51E0),
                                 label: "Planned",
                                 value: categories['Planned'] ?? 0,
+                                darkText: darkText,
+                                lightText: lightText,
                               ),
                               const SizedBox(height: 12),
                               _LegendItem(
                                 color: const Color(0xFF0F9D6C),
                                 label: "Personal",
                                 value: categories['Personal'] ?? 0,
+                                darkText: darkText,
+                                lightText: lightText,
                               ),
                             ],
                           ),
@@ -490,25 +514,29 @@ class AnalyticsScreen extends StatelessWidget {
 class _SectionCard extends StatelessWidget {
   final String title;
   final Widget child;
+  final Color cardColor;
+  final Color darkText;
+  final Color shadowColor;
 
   const _SectionCard({
     required this.title,
     required this.child,
+    required this.cardColor,
+    required this.darkText,
+    required this.shadowColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    const Color darkText = Color(0xFF0F172A);
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardColor,
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: shadowColor,
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -519,7 +547,7 @@ class _SectionCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: darkText,
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -537,11 +565,17 @@ class _StatCard extends StatelessWidget {
   final String value;
   final String label;
   final Color color;
+  final Color cardColor;
+  final Color shadowColor;
+  final Color lightText;
 
   const _StatCard({
     required this.value,
     required this.label,
     required this.color,
+    required this.cardColor,
+    required this.shadowColor,
+    required this.lightText,
   });
 
   @override
@@ -550,11 +584,11 @@ class _StatCard extends StatelessWidget {
       child: Container(
         height: 112,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardColor,
           borderRadius: BorderRadius.circular(26),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: shadowColor,
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -574,8 +608,8 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(
-                color: Color(0xFF8D97AE),
+              style: TextStyle(
+                color: lightText,
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 0.7,
@@ -592,11 +626,15 @@ class _LegendItem extends StatelessWidget {
   final Color color;
   final String label;
   final int value;
+  final Color darkText;
+  final Color lightText;
 
   const _LegendItem({
     required this.color,
     required this.label,
     required this.value,
+    required this.darkText,
+    required this.lightText,
   });
 
   @override
@@ -615,8 +653,8 @@ class _LegendItem extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: const TextStyle(
-              color: Color(0xFF0F172A),
+            style: TextStyle(
+              color: darkText,
               fontSize: 15,
               fontWeight: FontWeight.w700,
             ),
@@ -624,8 +662,8 @@ class _LegendItem extends StatelessWidget {
         ),
         Text(
           value.toString(),
-          style: const TextStyle(
-            color: Color(0xFF8D97AE),
+          style: TextStyle(
+            color: lightText,
             fontSize: 15,
             fontWeight: FontWeight.w800,
           ),
@@ -637,8 +675,12 @@ class _LegendItem extends StatelessWidget {
 
 class _DonutChartPainter extends CustomPainter {
   final Map<String, int> categories;
+  final bool isDark;
 
-  _DonutChartPainter(this.categories);
+  _DonutChartPainter(
+    this.categories, {
+    required this.isDark,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -648,7 +690,7 @@ class _DonutChartPainter extends CustomPainter {
     final radius = size.width / 2;
 
     final backgroundPaint = Paint()
-      ..color = const Color(0xFFEDEFF5)
+      ..color = isDark ? const Color(0xFF374151) : const Color(0xFFEDEFF5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 18
       ..strokeCap = StrokeCap.round;

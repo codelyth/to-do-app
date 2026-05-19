@@ -10,11 +10,6 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
-  final Color primaryColor = const Color(0xFF4B4ACF);
-  final Color bgColor = const Color(0xFFF5F6FA);
-  final Color darkText = const Color(0xFF0F172A);
-  final Color lightText = const Color(0xFF94A3B8);
-
   DateTime selectedDate = DateTime.now();
   DateTime currentMonth = DateTime(DateTime.now().year, DateTime.now().month);
 
@@ -44,16 +39,12 @@ class _EventsScreenState extends State<EventsScreen> {
 
   List<DateTime> _daysInMonth(DateTime month) {
     final firstDayOfMonth = DateTime(month.year, month.month, 1);
-    final lastDayOfMonth = DateTime(month.year, month.month + 1, 0);
-
     final startWeekday = firstDayOfMonth.weekday % 7;
-    final daysBefore = startWeekday;
+    final firstToDisplay =
+        firstDayOfMonth.subtract(Duration(days: startWeekday));
 
-    final firstToDisplay = firstDayOfMonth.subtract(Duration(days: daysBefore));
-
-    final totalDays = 42;
     return List.generate(
-      totalDays,
+      42,
       (index) => firstToDisplay.add(Duration(days: index)),
     );
   }
@@ -70,9 +61,7 @@ class _EventsScreenState extends State<EventsScreen> {
     final period = hour >= 12 ? 'PM' : 'AM';
     int displayHour = hour % 12;
     if (displayHour == 0) displayHour = 12;
-    final h = displayHour.toString().padLeft(2, '0');
-    final m = minute.toString().padLeft(2, '0');
-    return '$h:$m $period';
+    return '${displayHour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')} $period';
   }
 
   String _taskTimeText(Map<String, dynamic> task) {
@@ -105,7 +94,7 @@ class _EventsScreenState extends State<EventsScreen> {
     await _firestore.collection('tasks').doc(docId).delete();
   }
 
-  Future<void> _showAddTaskDialog() async {
+  Future<void> _showAddTaskDialog(Color primaryColor) async {
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
 
@@ -188,6 +177,9 @@ class _EventsScreenState extends State<EventsScreen> {
                   child: const Text('Cancel'),
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                  ),
                   onPressed: () async {
                     final title = titleController.text.trim();
                     final description = descriptionController.text.trim();
@@ -216,14 +208,13 @@ class _EventsScreenState extends State<EventsScreen> {
                       'startMinute': startTime?.minute,
                       'endHour': endTime?.hour,
                       'endMinute': endTime?.minute,
+                      'category': 'Planned',
+                      'priority': 'Normal',
                     });
 
                     if (!mounted) return;
                     Navigator.pop(context);
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                  ),
                   child: const Text(
                     'Save',
                     style: TextStyle(color: Colors.white),
@@ -249,62 +240,82 @@ class _EventsScreenState extends State<EventsScreen> {
     } else if (lower.contains('mail') || lower.contains('email')) {
       return Icons.done_all;
     }
+
     return Icons.event_note;
   }
 
-  Color _getTaskIconBg(String title) {
+  Color _getTaskIconBg(String title, bool isDark) {
     final lower = title.toLowerCase();
 
     if (lower.contains('gym') || lower.contains('workout')) {
-      return const Color(0xFFD8F3E8);
+      return isDark ? const Color(0xFF143A2D) : const Color(0xFFD8F3E8);
     } else if (lower.contains('lunch') || lower.contains('dinner')) {
-      return const Color(0xFFF6E9B8);
+      return isDark ? const Color(0xFF4A3515) : const Color(0xFFF6E9B8);
     } else if (lower.contains('meeting') || lower.contains('standup')) {
-      return const Color(0xFFE8E6F7);
+      return isDark ? const Color(0xFF32245A) : const Color(0xFFE8E6F7);
     } else if (lower.contains('mail') || lower.contains('email')) {
-      return const Color(0xFFE8EDF5);
+      return isDark ? const Color(0xFF374151) : const Color(0xFFE8EDF5);
     }
-    return const Color(0xFFEAECEF);
+
+    return isDark ? const Color(0xFF374151) : const Color(0xFFEAECEF);
   }
 
-  Color _getTaskIconColor(String title) {
+  Color _getTaskIconColor(String title, bool isDark, Color primaryColor) {
     final lower = title.toLowerCase();
 
     if (lower.contains('gym') || lower.contains('workout')) {
-      return const Color(0xFF0F9D6C);
+      return isDark ? const Color(0xFF7BE7A4) : const Color(0xFF0F9D6C);
     } else if (lower.contains('lunch') || lower.contains('dinner')) {
-      return const Color(0xFFDE7A00);
+      return isDark ? const Color(0xFFFFC56D) : const Color(0xFFDE7A00);
     } else if (lower.contains('meeting') || lower.contains('standup')) {
       return primaryColor;
     } else if (lower.contains('mail') || lower.contains('email')) {
-      return const Color(0xFFA0AABA);
+      return isDark ? const Color(0xFFCBD5E1) : const Color(0xFFA0AABA);
     }
-    return const Color(0xFF64748B);
+
+    return isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B);
   }
 
   @override
   Widget build(BuildContext context) {
     final days = _daysInMonth(currentMonth);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryColor =
+        isDark ? const Color(0xFF8B8CFF) : const Color(0xFF4B4ACF);
+    final bgColor =
+        isDark ? const Color(0xFF111827) : const Color(0xFFF5F6FA);
+    final cardColor = isDark ? const Color(0xFF1F2937) : Colors.white;
+    final darkText = isDark ? Colors.white : const Color(0xFF0F172A);
+    final lightText =
+        isDark ? const Color(0xFFCBD5E1) : const Color(0xFF94A3B8);
+    final fadedText =
+        isDark ? const Color(0xFF4B5563) : const Color(0xFFD3DCE8);
+    final iconColor =
+        isDark ? const Color(0xFFE5E7EB) : const Color(0xFF243B63);
+    final borderColor =
+        isDark ? const Color(0xFF374151) : const Color(0xFFD8DEE8);
+    final shadowColor = Colors.black.withOpacity(isDark ? 0.18 : 0.05);
 
     return Scaffold(
       backgroundColor: bgColor,
       floatingActionButton: Container(
         width: 56,
         height: 56,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Color(0x554B4ACF),
+              color: primaryColor.withOpacity(0.35),
               blurRadius: 24,
-              offset: Offset(0, 14),
+              offset: const Offset(0, 14),
             ),
           ],
         ),
         child: FloatingActionButton(
           backgroundColor: primaryColor,
           elevation: 0,
-          onPressed: _showAddTaskDialog,
+          onPressed: () => _showAddTaskDialog(primaryColor),
           child: const Icon(
             Icons.add,
             size: 34,
@@ -373,10 +384,10 @@ class _EventsScreenState extends State<EventsScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.calendar_month_outlined,
                         size: 32,
-                        color: Color(0xFF243B63),
+                        color: iconColor,
                       ),
                       Text(
                         "Calendar",
@@ -386,10 +397,10 @@ class _EventsScreenState extends State<EventsScreen> {
                           color: darkText,
                         ),
                       ),
-                      const Icon(
+                      Icon(
                         Icons.search,
                         size: 32,
-                        color: Color(0xFF243B63),
+                        color: iconColor,
                       ),
                     ],
                   ),
@@ -409,10 +420,10 @@ class _EventsScreenState extends State<EventsScreen> {
                             );
                           });
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.chevron_left,
                           size: 30,
-                          color: Color(0xFF0F172A),
+                          color: darkText,
                         ),
                       ),
                       Text(
@@ -432,10 +443,10 @@ class _EventsScreenState extends State<EventsScreen> {
                             );
                           });
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.chevron_right,
                           size: 30,
-                          color: Color(0xFF0F172A),
+                          color: darkText,
                         ),
                       ),
                     ],
@@ -443,16 +454,16 @@ class _EventsScreenState extends State<EventsScreen> {
 
                   const SizedBox(height: 22),
 
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _WeekDayLabel("S"),
-                      _WeekDayLabel("M"),
-                      _WeekDayLabel("T"),
-                      _WeekDayLabel("W"),
-                      _WeekDayLabel("T"),
-                      _WeekDayLabel("F"),
-                      _WeekDayLabel("S"),
+                      _WeekDayLabel("S", lightText),
+                      _WeekDayLabel("M", lightText),
+                      _WeekDayLabel("T", lightText),
+                      _WeekDayLabel("W", lightText),
+                      _WeekDayLabel("T", lightText),
+                      _WeekDayLabel("F", lightText),
+                      _WeekDayLabel("S", lightText),
                     ],
                   ),
 
@@ -487,11 +498,11 @@ class _EventsScreenState extends State<EventsScreen> {
                               ? BoxDecoration(
                                   color: primaryColor,
                                   borderRadius: BorderRadius.circular(18),
-                                  boxShadow: const [
+                                  boxShadow: [
                                     BoxShadow(
-                                      color: Color(0x334B4ACF),
+                                      color: primaryColor.withOpacity(0.22),
                                       blurRadius: 12,
-                                      offset: Offset(0, 8),
+                                      offset: const Offset(0, 8),
                                     ),
                                   ],
                                 )
@@ -508,7 +519,7 @@ class _EventsScreenState extends State<EventsScreen> {
                                       ? Colors.white
                                       : isCurrentMonth
                                           ? darkText
-                                          : const Color(0xFFD3DCE8),
+                                          : fadedText,
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -537,7 +548,9 @@ class _EventsScreenState extends State<EventsScreen> {
                       width: 88,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFD9DEE8),
+                        color: isDark
+                            ? const Color(0xFF374151)
+                            : const Color(0xFFD9DEE8),
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
@@ -574,15 +587,22 @@ class _EventsScreenState extends State<EventsScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: cardColor,
                         borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: shadowColor,
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           "No events for this day",
                           style: TextStyle(
                             fontSize: 16,
-                            color: Color(0xFF64748B),
+                            color: lightText,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -601,9 +621,16 @@ class _EventsScreenState extends State<EventsScreen> {
                           title: title,
                           time: timeText,
                           icon: _getTaskIcon(title),
-                          iconBg: _getTaskIconBg(title),
-                          iconColor: _getTaskIconColor(title),
+                          iconBg: _getTaskIconBg(title, isDark),
+                          iconColor:
+                              _getTaskIconColor(title, isDark, primaryColor),
                           completed: completed,
+                          cardColor: cardColor,
+                          darkText: darkText,
+                          lightText: lightText,
+                          borderColor: borderColor,
+                          primaryColor: primaryColor,
+                          shadowColor: shadowColor,
                           onCheck: () => _toggleTask(doc.id, completed),
                           onDelete: () => _deleteTask(doc.id),
                         ),
@@ -621,7 +648,9 @@ class _EventsScreenState extends State<EventsScreen> {
 
 class _WeekDayLabel extends StatelessWidget {
   final String text;
-  const _WeekDayLabel(this.text);
+  final Color color;
+
+  const _WeekDayLabel(this.text, this.color);
 
   @override
   Widget build(BuildContext context) {
@@ -630,10 +659,10 @@ class _WeekDayLabel extends StatelessWidget {
       child: Center(
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Color(0xFFA0AEC0),
+            color: color,
           ),
         ),
       ),
@@ -648,6 +677,12 @@ class _TaskCard extends StatelessWidget {
   final Color iconBg;
   final Color iconColor;
   final bool completed;
+  final Color cardColor;
+  final Color darkText;
+  final Color lightText;
+  final Color borderColor;
+  final Color primaryColor;
+  final Color shadowColor;
   final VoidCallback onCheck;
   final VoidCallback onDelete;
 
@@ -658,6 +693,12 @@ class _TaskCard extends StatelessWidget {
     required this.iconBg,
     required this.iconColor,
     required this.completed,
+    required this.cardColor,
+    required this.darkText,
+    required this.lightText,
+    required this.borderColor,
+    required this.primaryColor,
+    required this.shadowColor,
     required this.onCheck,
     required this.onDelete,
   });
@@ -667,16 +708,14 @@ class _TaskCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(completed ? 0.58 : 1),
+        color: cardColor.withOpacity(completed ? 0.72 : 1),
         borderRadius: BorderRadius.circular(28),
-        border: completed
-            ? Border.all(color: const Color(0xFFD8DEE8))
-            : null,
+        border: completed ? Border.all(color: borderColor) : null,
         boxShadow: completed
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: shadowColor,
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -707,9 +746,10 @@ class _TaskCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF0F172A).withOpacity(completed ? 0.55 : 1),
-                    decoration:
-                        completed ? TextDecoration.lineThrough : TextDecoration.none,
+                    color: darkText.withOpacity(completed ? 0.55 : 1),
+                    decoration: completed
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -718,7 +758,7 @@ class _TaskCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF64748B).withOpacity(completed ? 0.65 : 1),
+                    color: lightText.withOpacity(completed ? 0.65 : 1),
                   ),
                 ),
               ],
@@ -734,10 +774,10 @@ class _TaskCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: const Color(0xFFCBD5E1),
+                      color: borderColor,
                       width: 2,
                     ),
-                    color: completed ? const Color(0xFF4B4ACF) : Colors.white,
+                    color: completed ? primaryColor : cardColor,
                   ),
                   child: completed
                       ? const Icon(Icons.check, color: Colors.white, size: 22)
@@ -747,9 +787,9 @@ class _TaskCard extends StatelessWidget {
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: onDelete,
-                child: const Icon(
+                child: Icon(
                   Icons.delete_outline,
-                  color: Color(0xFF94A3B8),
+                  color: lightText,
                 ),
               ),
             ],
