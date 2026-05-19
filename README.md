@@ -1,4 +1,4 @@
-# To Do App 💙
+# To Do App
 
 To Do App is a modern task management application developed to help users organize and track their daily and planned tasks efficiently. Users can create an account, log in securely, and manage only their own tasks with real-time synchronization.
 
